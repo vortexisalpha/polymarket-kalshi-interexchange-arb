@@ -53,13 +53,18 @@ class KalshiExtractor:
 
         return all_series
 
-    def get_individual_series_data(self, title):
-        series_id = self.title
+    def get_markets_by_series(self, title, limit = 100):
+        series_id = self.title_to_ticker[title]
+        market_params = {"series_ticker" : series_id, "limit" : limit, "status" : "open"}
+
+        markets = requests.get(f"{self.BASE}/markets", params=market_params).json()
+        return markets
+
 def write_to_file(filepath, data):
     with open(filepath, "w") as f:
         for event in data:
             f.writelines(f"{event['title']}\n")
-            
+
 if __name__ == "__main__":
     poly_extractor = PolyExtractor()
 
@@ -93,3 +98,15 @@ if __name__ == "__main__":
         print(f"Kalshi title: {kalshi_title}")
         print(f"Kalshi ID: {kalshi_extractor.title_to_ticker[kalshi_title]}")
 
+        print("\n"*3)
+
+        kalshi_markets = kalshi_extractor.get_markets_by_series(kalshi_title)['markets']
+
+        print(f"Kalshi Markets for {kalshi_title}")
+        for market in kalshi_markets:
+            print(f"title: {market['yes_sub_title']}")
+            print(f"yes ask: {market['yes_ask']}")
+            print(f"no ask: {market['no_ask']}")
+
+
+            
