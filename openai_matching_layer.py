@@ -109,7 +109,8 @@ def match_titles_with_ai(poly_titles: List[str], kalshi_titles: List[str]) -> Li
         "- same time window / date / timezone reference\n"
         "- same directionality (above/below, up/down)\n"
         "If uncertain, do NOT include the pair.\n"
-        "Return ONLY via the provided function call."
+        "Return ONLY via the provided function call." \
+        "Note that the date today is Tuesday 23rd December 2025"
     )
 
     user = {
@@ -158,7 +159,10 @@ def get_matching_pairs(poly_titles_in = None, kalshi_titles_in = None) -> List[D
     pairs = match_titles_with_ai(poly_titles, kalshi_titles)
 
     print(f"\nFound {len(pairs)} potential same-market pairs:\n")
-
+    with open("arb_pairs.json", "w", encoding="utf-8") as f:
+        json.dump(pairs, f, ensure_ascii=False, indent=2)
+    print("Saved: arb_pairs.json\n")
+    
     return pairs 
 
 if __name__ == "__main__":

@@ -23,29 +23,32 @@ class PolyExtractor:
            event_params["tag_id"] = self.get_tag_id(tag_name)
 
         events = requests.get(f"{self.BASE}/events", params=event_params).json()
-
+        
         for event in events:
-            self.title_to_markets[event['title']] = event['markets']
+            markets = event['markets']
+            for market in markets:
+                self.title_to_markets[market["question"]] = market
 
         return events
     
-    def get_markets(self, market_title):
-        markets = self.title_to_markets[market_title]
-        return markets
+    def get_markets(self, events):
+        return events['markets']
 
-    def print_markets(market):
+    def print_market(self, market):
         outcomes = json.loads(market.get("outcomes"))
         outcome_prices = json.loads(market.get("outcomePrices"))
         question = market.get("question")
-        print(f"{question}")
-        for outcome, price in zip(outcomes, outcome_prices):
-            print(f"{outcome}: {price}")
+        if 1 not in outcome_prices:
+            print(f"Poly: {question}")
+            for outcome, price in zip(outcomes, outcome_prices):
+                print(f"{outcome}: {price}")
 
 
 class KalshiExtractor:
     def __init__(self):
         self.BASE = "https://api.elections.kalshi.com/trade-api/v2"
         self.title_to_ticker = {}
+        self.title_to_markets = {}
     def get_series(self, category, tags):
         series_params = {"limit" : 1000, "category" : category, "tags" : tags}
 
@@ -66,12 +69,19 @@ class KalshiExtractor:
 
         return all_series
 
-    def get_markets_by_series(self, title, limit = 100):
-        series_id = self.title_to_ticker[title]
-        market_params = {"series_ticker" : series_id, "limit" : limit, "status" : "open"}
+    def get_markets(self, ticker, limit = 100):
+        market_params = {"series_ticker" : ticker, "limit" : limit, "status" : "open"}
 
-        markets = requests.get(f"{self.BASE}/markets", params=market_params).json()
+        markets = requests.get(f"{self.BASE}/markets", params=market_params).json()['markets']
+
+        for market in markets:
+            self.title_to_markets[f"{market['title']} {market['yes_sub_title']}"] = market
         return markets
+
+    def print_market(self, market):
+        print(f"Kalshi: {market['yes_sub_title']}")
+        print(f"yes ask: {market['yes_ask']}")
+        print(f"no ask: {market['no_ask']}")
 
 def write_to_file(filepath, data):
     with open(filepath, "w") as f:
@@ -80,51 +90,44 @@ def write_to_file(filepath, data):
 
 if __name__ == "__main__":
     poly_extractor = PolyExtractor()
-
-    bitcoin_events = poly_extractor.get_events("Bitcoin")
-    print("Poly series data:")
-    for bitcoin_event in bitcoin_events:
-        print(bitcoin_event['title'])
-
     kalshi_extractor = KalshiExtractor()    
 
+    bitcoin_events = poly_extractor.get_events("Bitcoin")
     bitcoin_series = kalshi_extractor.get_series(category="Crypto", tags="BTC")
-    print("\n"*3 + "Kalshi series data:")
-    for bitcoin_event in bitcoin_series:
-        print(bitcoin_event['title'])
 
+    #get list of all markets under all series/events related to category specified
+    bitcoin_poly_markets = []         
+    bitcoin_kalshi_markets = []         
+
+    for event in bitcoin_events:
+        markets = poly_extractor.get_markets(event)
+        for market in markets:
+            bitcoin_poly_markets.append(market['question'])
+
+    for series in bitcoin_series:
+        markets = kalshi_extractor.get_markets(series['ticker'])
+        for market in markets:
+            bitcoin_kalshi_markets.append(f"{market['title']} {market['yes_sub_title']}")
+
+    print(f"len of poly markets {len(bitcoin_poly_markets)}")
+    print(f"len of kalshi markets {len(bitcoin_kalshi_markets)}")
+
+    matching_pairs = get_matching_pairs(poly_titles_in = bitcoin_poly_markets,kalshi_titles_in = bitcoin_kalshi_markets)
     '''
-    write_to_file("poly_btc_events.txt", bitcoin_events)
-    write_to_file("kalshi_crypto_series.txt", bitcoin_series)
-    '''    
-
-    #matching_pairs = get_matching_pairs(poly_titles_in = bitcoin_events,kalshi_titles_in = bitcoin_series)
     with open("arb_pairs.json", "r") as f:
         matching_pairs = json.load(f)
-
+    '''
     for matching_pair in matching_pairs:
         poly_title = matching_pair['poly_title']
+        poly_market = poly_extractor.title_to_markets[poly_title]
         kalshi_title = matching_pair['kalshi_title']
+        kalshi_market = kalshi_extractor.title_to_markets[kalshi_title]
 
-        print(f"Poly event title: {poly_title}")
-        print(f"Kalshi series title: {kalshi_title}")
+        poly_extractor.print_market(poly_market)
+
+        print("\n")
+
+        print(f"Kalshi: {kalshi_title}")
+        kalshi_extractor.print_market(kalshi_market)
 
         print("\n"*3)
-
-        poly_markets = poly_extractor.get_markets(poly_title)
-        kalshi_markets = kalshi_extractor.get_markets_by_series(kalshi_title)['markets']
-
-        print(f"Poly Markets for: {poly_title}")
-        for market in poly_markets:
-            poly_extractor.print_market(market)
-        ###
-        print("\n"*2)
-
-        print(f"Kalshi Markets for: {kalshi_title}")
-        for market in kalshi_markets:
-            print(f"title: {market['yes_sub_title']}")
-            print(f"yes ask: {market['yes_ask']}")
-            print(f"no ask: {market['no_ask']}")
-
-
-            
