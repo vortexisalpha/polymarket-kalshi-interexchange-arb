@@ -1,110 +1,32 @@
 [
   {
-    "poly_title": "Will Bitcoin reach $250,000 by December 31, 2025?",
-    "kalshi_title": "Will Bitcoin be above $250000 by Jan 1, 2027 at 12:00AM ET? Above $250000",
-    "reason": "Both ask if Bitcoin will be above $250,000 by the end of 2025/very start of 2027 (effectively same resolution date).",
-    "confidence": 0.9
+    "poly_title": "Will Bitcoin reach $100,000 by December 31, 2025?",
+    "kalshi_title": "Will Bitcoin be above $$100,000 by Dec 31, 2025 at 11:59pm ET? Above $100,000",
+    "reason": "Both contracts ask if Bitcoin price will be above $100,000 at the exact same date and time (Dec 31, 2025, 11:59pm ET).",
+    "confidence": 1.0
   },
   {
     "poly_title": "Will Bitcoin reach $200,000 by December 31, 2025?",
-    "kalshi_title": "Will Bitcoin be above $200000 by Jan 1, 2027 at 11:59PM ET? Above $200000",
-    "reason": "Both ask if Bitcoin will be above $200,000 by the end of 2025/very start of 2027 (effectively same resolution date).",
+    "kalshi_title": "How high will Bitcoin get this year? $200,000 or above",
+    "reason": "Both contracts ask if Bitcoin will reach or exceed $200,000 in the year 2025.",
+    "confidence": 0.95
+  },
+  {
+    "poly_title": "Will Bitcoin reach $250,000 by December 31, 2025?",
+    "kalshi_title": "Will Bitcoin be above $250000 by Jan 1, 2027 at 12:00AM ET? Above $250000",
+    "reason": "Both contracts ask if Bitcoin will be above $250,000 by the end of 2025 (Kalshi contract's Jan 1, 2027 12:00AM ET is equivalent to end of 2025).",
     "confidence": 0.9
-  },
-  {
-    "poly_title": "Will Bitcoin reach $140,000 by December 31, 2025?",
-    "kalshi_title": "How high will Bitcoin get this year? $140,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $140,000 by the end of 2025.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $130,000 by December 31, 2025?",
-    "kalshi_title": "How high will Bitcoin get this year? $130,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $130,000 by the end of 2025.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $150,000 by December 31, 2025?",
-    "kalshi_title": "How high will Bitcoin get this year? $150,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $150,000 by the end of 2025.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $170,000 by December 31, 2025?",
-    "kalshi_title": "How high will Bitcoin get this year? $170,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $170,000 by the end of 2025.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $180,000 by December 31, 2026?",
-    "kalshi_title": "How high will Bitcoin get this year? $180,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $180,000 by the end of 2026.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $160,000 by December 31, 2026?",
-    "kalshi_title": "How high will Bitcoin get this year? $160,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $160,000 by the end of 2026.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $200,000 by December 31, 2026?",
-    "kalshi_title": "Will Bitcoin be above $199999.99 by Dec 31, 2026 at 11:59 PM ET? Above $199999.99",
-    "reason": "Both ask if Bitcoin will be above $200,000 by the end of 2026.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $190,000 by December 31, 2026?",
-    "kalshi_title": "How high will Bitcoin get this year? $190,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $190,000 by the end of 2026.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $140,000 by December 31, 2026?",
-    "kalshi_title": "How high will Bitcoin get this year? $140,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $140,000 by the end of 2026.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $130,000 by December 31, 2026?",
-    "kalshi_title": "How high will Bitcoin get this year? $130,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $130,000 by the end of 2026.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $150,000 by December 31, 2026?",
-    "kalshi_title": "How high will Bitcoin get this year? $150,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $150,000 by the end of 2026.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $110,000 by December 31, 2026?",
-    "kalshi_title": "How high will Bitcoin get this year? $110,000 or above",
-    "reason": "Both ask if Bitcoin will reach or exceed $110,000 by the end of 2026.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin reach $100,000 by December 31, 2026?",
-    "kalshi_title": "Will Bitcoin be above $$100,000 by Dec 31, 2025 at 11:59pm ET? Above $100,000",
-    "reason": "Both ask if Bitcoin will be above $100,000 by the end of 2026 (Polymarket date is 2026, Kalshi date is 2025, so not exact, but close). Due to strict requirement, exclude this pair.",
-    "confidence": 0.0
   },
   {
     "poly_title": "Will Bitcoin dip to $50,000 by December 31, 2025?",
     "kalshi_title": "How low will Bitcoin get this year? Below $50,000",
-    "reason": "Both ask if Bitcoin will dip below $50,000 by the end of 2025.",
-    "confidence": 1.0
+    "reason": "Both contracts ask if Bitcoin will dip below $50,000 at any time during 2025.",
+    "confidence": 0.95
   },
   {
     "poly_title": "Will Bitcoin dip to $70,000 by December 31, 2025?",
     "kalshi_title": "How low will Bitcoin get this year? Below $70,000",
-    "reason": "Both ask if Bitcoin will dip below $70,000 by the end of 2025.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Bitcoin dip to $80,000 by December 31, 2025?",
-    "kalshi_title": "How low will Bitcoin get this year? Below $80,000",
-    "reason": "Both ask if Bitcoin will dip below $80,000 by the end of 2025.",
-    "confidence": 1.0
+    "reason": "Both contracts ask if Bitcoin will dip below $70,000 at any time during 2025.",
+    "confidence": 0.95
   }
 ]
