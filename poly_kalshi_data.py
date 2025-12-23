@@ -5,7 +5,7 @@ from openai_matching_layer import get_matching_pairs
 class PolyExtractor:
     def __init__(self):
         self.BASE = "https://gamma-api.polymarket.com/"
-        self.title_to_ticker = {}
+        self.title_to_markets = {}
          
     def get_tag_id(self, tag_name : str):
         all_tags = requests.get(f"{self.BASE}/tags").json()
@@ -25,9 +25,22 @@ class PolyExtractor:
         events = requests.get(f"{self.BASE}/events", params=event_params).json()
 
         for event in events:
-            self.title_to_ticker[event['title']] = event['ticker']
+            self.title_to_markets[event['title']] = event['markets']
 
         return events
+    
+    def get_markets(self, market_title):
+        markets = self.title_to_markets[market_title]
+        return markets
+
+    def print_markets(market):
+        outcomes = json.loads(market.get("outcomes"))
+        outcome_prices = json.loads(market.get("outcomePrices"))
+        question = market.get("question")
+        print(f"{question}")
+        for outcome, price in zip(outcomes, outcome_prices):
+            print(f"{outcome}: {price}")
+
 
 class KalshiExtractor:
     def __init__(self):
@@ -93,16 +106,21 @@ if __name__ == "__main__":
         poly_title = matching_pair['poly_title']
         kalshi_title = matching_pair['kalshi_title']
 
-        print(f"Poly title: {poly_title}")
-        print(f"Poly ID: {poly_extractor.title_to_ticker[poly_title]}")
-        print(f"Kalshi title: {kalshi_title}")
-        print(f"Kalshi ID: {kalshi_extractor.title_to_ticker[kalshi_title]}")
+        print(f"Poly event title: {poly_title}")
+        print(f"Kalshi series title: {kalshi_title}")
 
         print("\n"*3)
 
+        poly_markets = poly_extractor.get_markets(poly_title)
         kalshi_markets = kalshi_extractor.get_markets_by_series(kalshi_title)['markets']
 
-        print(f"Kalshi Markets for {kalshi_title}")
+        print(f"Poly Markets for: {poly_title}")
+        for market in poly_markets:
+            poly_extractor.print_market(market)
+        ###
+        print("\n"*2)
+
+        print(f"Kalshi Markets for: {kalshi_title}")
         for market in kalshi_markets:
             print(f"title: {market['yes_sub_title']}")
             print(f"yes ask: {market['yes_ask']}")
