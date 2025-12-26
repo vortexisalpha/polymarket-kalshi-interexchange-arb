@@ -1,5 +1,5 @@
 from run_engine import Engine
-from dataclass import dataclass
+from dataclasses import dataclass
 
 
 @dataclass
@@ -8,7 +8,7 @@ class Market:
     category: str
     yes_price: float
     no_price: float
-    close_time: date
+    close_time: str
     market_type: str
     exchange: str
     # unsure of how to deal wth strikes but they are super valuable
@@ -18,7 +18,7 @@ class Market:
 
 class MatchingEngine(Engine):
     def __init__(self):
-        super.__init__(self)
+        super().__init__()
         self.complex_matcher = ComplexMatcher()
 
     def get_matching_markets(self):
@@ -31,6 +31,10 @@ class MatchingEngine(Engine):
         self.matching_pairs = self.complex_matcher.get_matching_pairs(
             poly_ttm, kalshi_ttm)
         pass
+
+    def run_engine(self, poly_category, kalshi_category, kalshi_tags):
+        self.get_markets(poly_category, kalshi_category, kalshi_tags)
+        self.get_matching_markets()
 
 
 class ComplexMatcher:
@@ -54,14 +58,15 @@ class ComplexMatcher:
                 strike_lb = float(market['floor_strike'])
             except:
                 strike_lb = None
+
             try:
                 strike_ub = float(market['cap_strike'])
             except:
                 strike_ub = None
 
             market_type = market['market_type']
-            kalshi_market_list.append(
-                Market(title, yes_price, no_price, close_time, market_type, exchange, strike_lb, strike_ub))
+            kalshi_market_list.append(Market(
+                title, yes_price, no_price, close_time, market_type, exchange, strike_lb, strike_ub))
 
         poly_market_list = []
 
@@ -85,9 +90,23 @@ class ComplexMatcher:
                 strike_ub = None
 
             market_type = market['marketType']
-            kalshi_market_list.append(
-                Market(title, yes_price, no_price, close_time, market_type, exchange))
+            kalshi_market_list.append(Market(
+                title, yes_price, no_price, close_time, market_type, exchange, strike_lb, strike_ub))
 
     def get_matching_pairs(self, poly_ttm, kalshi_ttm):
         kalshi_market_list, poly_market_list = self.format_ttms(
             poly_ttm, kalshi_ttm)
+
+        for k_market in kalshi_market_list:
+            print(k_market)
+
+
+if __name__ == "__main__":
+
+    category_name = "Crypto"
+
+    arb_engine = MatchingEngine()
+    poly_category, kalshi_category, kalshi_tags = arb_engine.get_categories_from_file(
+        category_name)
+    arb_engine.run_engine(poly_category, kalshi_category, kalshi_tags)
+    pass
