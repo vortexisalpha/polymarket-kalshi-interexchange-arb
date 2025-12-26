@@ -69,8 +69,11 @@ class KalshiExtractor:
         self.title_to_markets = {}
         self.event_to_series = {}
 
-    def get_series(self, category, tags):
-        series_params = {"limit" : 1000, "category" : category, "tags" : tags}
+    def get_series(self, category, tag):
+        if tag is not None:
+            series_params = {"limit" : 1000, "category" : category, "tags" : tag}
+        else:
+            series_params = {"limit" : 1000, "category" : category}
 
         all_series = []
         while True:
@@ -187,14 +190,16 @@ def write_to_file(filepath, data):
         for event in data:
             f.writelines(f"{event['title']}\n")
 
+
+
 if __name__ == "__main__":
     poly_extractor = PolyExtractor()
     kalshi_extractor = KalshiExtractor()    
 
     bitcoin_events = poly_extractor.get_events("Trump")
     bitcoin_series = []
-    bitcoin_series.extend(kalshi_extractor.get_series(category="Politics", tags="Trump Agenda"))
-    bitcoin_series.extend(kalshi_extractor.get_series(category="Politics", tags="Trump Policies"))
+    bitcoin_series.extend(kalshi_extractor.get_series(category="Politics", tag="Trump Agenda"))
+    bitcoin_series.extend(kalshi_extractor.get_series(category="Politics", tag="Trump Policies"))
 
     #get list of all markets under all series/events related to category specified
     bitcoin_poly_markets = []         
@@ -232,7 +237,7 @@ if __name__ == "__main__":
         p_yes, p_no, p_link = poly_extractor.get_market_yn_link(poly_market)
         k_yes, k_no, k_link = kalshi_extractor.get_market_yn_link(kalshi_market)
         
-        if None in (kalshi_title, k_yes, k_no, k_link, poly_title, p_yes, p_no, p_link):
+        if None in (kalshi_title, k_yes, k_no, k_link, poly_title, p_yes, p_no, p_link):    
             continue
         pair_list.append(ArbitragePair(kalshi_title, k_yes, k_no, k_link, poly_title, p_yes, p_no, p_link))
 

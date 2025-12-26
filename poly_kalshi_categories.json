@@ -1,0 +1,155 @@
+{
+  "Climate and Weather": {
+    "poly_category": "Climate / Weather",
+    "kalshi_category": "Climate and Weather",
+    "kalshi_tags": [
+      "Snow and rain",
+      "Daily temperature",
+      "Climate change",
+      "Hurricanes",
+      "Natural disasters"
+    ]
+  },
+  "Companies": {
+    "poly_category": "Business / Companies",
+    "kalshi_category": "Companies",
+    "kalshi_tags": [
+      "CEOs",
+      "KPIs",
+      "Elon Musk",
+      "Product launches",
+      "Layoffs",
+      "Earnings Mention"
+    ]
+  },
+  "Crypto": {
+    "poly_category": "Crypto",
+    "kalshi_category": "Crypto",
+    "kalshi_tags": [
+      "SOL",
+      "Pre-Market",
+      "BTC",
+      "Hourly",
+      "ETH",
+      "SHIBA",
+      "Dogecoin"
+    ]
+  },
+  "Economics": {
+    "poly_category": "Economy / Macro",
+    "kalshi_category": "Economics",
+    "kalshi_tags": [
+      "Inflation",
+      "Fed",
+      "Growth",
+      "Employment",
+      "Oil and energy"
+    ]
+  },
+  "Financials": {
+    "poly_category": "Markets / Finance",
+    "kalshi_category": "Financials",
+    "kalshi_tags": [
+      "S&P",
+      "Daily",
+      "EUR/USD",
+      "Nasdaq",
+      "WTI",
+      "Treasuries",
+      "USD/JPY"
+    ]
+  },
+  "Entertainment": {
+    "poly_category": "Entertainment / Pop Culture",
+    "kalshi_category": "Entertainment",
+    "kalshi_tags": [
+      "Awards",
+      "Music",
+      "Movies",
+      "Music charts",
+      "Oscars",
+      "Television",
+      "Video games",
+      "Rotten Tomatoes",
+      "Live Music",
+      "StockX",
+      "Music Streams",
+      "Morgan Wallen"
+    ]
+  },
+  "Health": {
+    "poly_category": "Health",
+    "kalshi_category": "Health",
+    "kalshi_tags": [
+      "Diseases",
+      "Health Tech",
+      "FDA Approval",
+      "Drug Prices",
+      "Vaccines"
+    ]
+  },
+  "Politics (US)": {
+    "poly_category": "Politics",
+    "kalshi_category": "Politics",
+    "kalshi_tags": [
+      "Trump Agenda",
+      "Culture war",
+      "Bills",
+      "SCOTUS & courts",
+      "US Elections",
+      "Debt ceiling & shutdowns",
+      "Immigration",
+      "Approval ratings",
+      "Cabinet",
+      "Policy",
+      "Trump Policies",
+      "Confirmations"
+    ]
+  },
+  "Science and Technology": {
+    "poly_category": "Science & Technology",
+    "kalshi_category": "Science and Technology",
+    "kalshi_tags": [
+      "AI",
+      "AI Transfers",
+      "Space",
+      "Energy",
+      "Papers",
+      "Medicine"
+    ]
+  },
+  "Sports": {
+    "poly_category": "Sports",
+    "kalshi_category": "Sports",
+    "kalshi_tags": [
+      "Football",
+      "Soccer",
+      "Basketball",
+      "Baseball",
+      "Hockey",
+      "Tennis",
+      "UFC",
+      "Golf",
+      "MMA",
+      "NFL",
+      "Chess",
+      "Cricket",
+      "Boxing",
+      "Motorsport"
+    ]
+  },
+  "Transportation": {
+    "poly_category": "Travel / Transportation",
+    "kalshi_category": "Transportation",
+    "kalshi_tags": [
+      "Airlines & aviation"
+    ]
+  },
+  "World": {
+    "poly_category": "World / International",
+    "kalshi_category": "World",
+    "kalshi_tags": [
+      "Foreign economies"
+    ]
+  }
+}

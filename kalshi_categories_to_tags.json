@@ -1,0 +1,113 @@
+{
+  "Climate and Weather": [
+    "Snow and rain",
+    "Daily temperature",
+    "Climate change",
+    "Hurricanes",
+    "Natural disasters"
+  ],
+  "Companies": [
+    "CEOs",
+    "KPIs",
+    "Elon Musk",
+    "Product launches",
+    "Layoffs",
+    "Earnings Mention"
+  ],
+  "Crypto": [
+    "SOL",
+    "Pre-Market",
+    "BTC",
+    "Hourly",
+    "ETH",
+    "SHIBA",
+    "Dogecoin"
+  ],
+  "Economics": [
+    "Inflation",
+    "Fed",
+    "Growth",
+    "Employment",
+    "Oil and energy"
+  ],
+  "Education": null,
+  "Elections": null,
+  "Entertainment": [
+    "Awards",
+    "Music",
+    "Movies",
+    "Music charts",
+    "Oscars",
+    "Television",
+    "Video games",
+    "Rotten Tomatoes",
+    "Live Music",
+    "StockX",
+    "Music Streams",
+    "Morgan Wallen"
+  ],
+  "Financials": [
+    "S&P",
+    "Daily",
+    "EUR/USD",
+    "Nasdaq",
+    "WTI",
+    "Treasuries",
+    "USD/JPY"
+  ],
+  "Health": [
+    "Diseases",
+    "Health Tech",
+    "FDA Approval",
+    "Drug Prices",
+    "Vaccines"
+  ],
+  "Mentions": null,
+  "Politics": [
+    "Trump Agenda",
+    "Culture war",
+    "Bills",
+    "SCOTUS & courts",
+    "Foreign Elections",
+    "US Elections",
+    "Education",
+    "Debt ceiling & shutdowns",
+    "Immigration",
+    "Approval ratings",
+    "Cabinet",
+    "Policy",
+    "Trump Policies",
+    "Confirmations"
+  ],
+  "Science and Technology": [
+    "AI",
+    "AI Transfers",
+    "Space",
+    "Energy",
+    "Papers",
+    "Medicine"
+  ],
+  "Social": null,
+  "Sports": [
+    "Football",
+    "Soccer",
+    "Basketball",
+    "Baseball",
+    "Hockey",
+    "Tennis",
+    "UFC",
+    "Golf",
+    "MMA",
+    "NFL",
+    "Chess",
+    "Cricket",
+    "Boxing",
+    "Motorsport"
+  ],
+  "Transportation": [
+    "Airlines & aviation"
+  ],
+  "World": [
+    "Foreign economies"
+  ]
+}

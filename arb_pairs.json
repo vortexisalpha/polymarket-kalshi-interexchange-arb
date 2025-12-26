@@ -1,50 +1,20 @@
 [
   {
-    "poly_title": "Will Trump deport 750,000 or more people in 2025?",
-    "kalshi_title": "How many deportations in Trump's first year? At least 750,000",
-    "reason": "Both ask if deportations under Trump in 2025 will be at least 750,000, same threshold and time window.",
+    "poly_title": "New pandemic in 2025?",
+    "kalshi_title": "New pandemic by 2025? By Dec 31, 2025",
+    "reason": "Both titles refer to the occurrence of a new pandemic within the year 2025, with the same cutoff date Dec 31, 2025.",
     "confidence": 1.0
   },
   {
-    "poly_title": "Will Trump deport 500,000-750,000- people?",
-    "kalshi_title": "How many deportations in Trump's first year? At least 500,000",
-    "reason": "Poly market asks about deportations between 500k-750k, Kalshi market asks if at least 500k, overlapping threshold and same time window, representing the same condition for 500k threshold.",
-    "confidence": 0.9
-  },
-  {
-    "poly_title": "Will Trump deport 1,000,000-1,250,000 people?",
-    "kalshi_title": "How many deportations in Trump's first year? At least 1,000,000",
-    "reason": "Poly market asks about deportations between 1m-1.25m, Kalshi market asks if at least 1m, overlapping threshold and same time window, representing the same condition for 1m threshold.",
-    "confidence": 0.9
-  },
-  {
-    "poly_title": "Will Trump deport 2,000,000 or more people?",
-    "kalshi_title": "How many deportations in Trump's first year? At least 2,000,000",
-    "reason": "Both ask if deportations under Trump in 2025 will be at least 2,000,000, same threshold and time window.",
+    "poly_title": "New pandemic in 2025?",
+    "kalshi_title": "New pandemic by 2025? By Dec 31, 2025",
+    "reason": "Repeated Kalshi title matching the same Polymarket title, exact same resolution criteria.",
     "confidence": 1.0
   },
   {
-    "poly_title": "Will Trump cut corporate taxes in 2025?",
-    "kalshi_title": "Will the corporate tax be decreased before Jan 1, 2026? Yes",
-    "reason": "Both ask if corporate taxes will be cut/decreased during 2025, same tax type and time window.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Trump acquire Greenland in 2025?",
-    "kalshi_title": "Will Trump buy Greenland? During Trump's term",
-    "reason": "Both ask if Trump will acquire/buy Greenland during his term, same asset and time window.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Trump end the Federal Reserve before Jan 1, 2027?",
-    "kalshi_title": "Will Trump end the Federal Reserve before Jan 1, 2027? Before Jan 1, 2027",
-    "reason": "Exact same market question about ending the Federal Reserve before Jan 1, 2027.",
-    "confidence": 1.0
-  },
-  {
-    "poly_title": "Will Trump veto a bill in 2025?",
-    "kalshi_title": "Will Trump veto at least 1 bills before Jan 1, 2026? At least 1",
-    "reason": "Both ask if Trump will veto at least one bill before Jan 1, 2026 (covering all of 2025).",
-    "confidence": 1.0
+    "poly_title": "Will RFK end any vaccine approvals by December 31?",
+    "kalshi_title": "Will any Covid vaccine lose its FDA approval in the US in 2025? By Dec 31, 2025",
+    "reason": "Both titles concern ending or losing vaccine approvals by the end of 2025, same date cutoff Dec 31, 2025, same directionality (end/lose approval).",
+    "confidence": 0.95
   }
 ]
