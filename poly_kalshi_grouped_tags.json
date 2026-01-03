@@ -1,0 +1,125 @@
+{
+  "Climate and Weather": {
+    "poly_tag": "megaquake",
+    "kalshi_category": "Climate and Weather",
+    "kalshi_tags": [
+      "Natural disasters",
+      "Climate change"
+    ]
+  },
+  "Companies": {
+    "poly_tag": "markt cap",
+    "kalshi_category": "Companies",
+    "kalshi_tags": [
+      "KPIs",
+      "Earnings Mention",
+      "CEOs"
+    ]
+  },
+  "Crypto": {
+    "poly_tag": "Bitcoin",
+    "kalshi_category": "Crypto",
+    "kalshi_tags": [
+      "BTC"
+    ]
+  },
+  "Economics": {
+    "poly_tag": "interest rates",
+    "kalshi_category": "Economics",
+    "kalshi_tags": [
+      "Fed",
+      "Inflation",
+      "Growth"
+    ]
+  },
+  "Education": {
+    "poly_tag": "Boise State",
+    "kalshi_category": "Education",
+    "kalshi_tags": []
+  },
+  "Elections": {
+    "poly_tag": "US Election",
+    "kalshi_category": "Elections",
+    "kalshi_tags": []
+  },
+  "Entertainment": {
+    "poly_tag": "Rotten Tomatoes",
+    "kalshi_category": "Entertainment",
+    "kalshi_tags": [
+      "Rotten Tomatoes",
+      "Movies",
+      "Oscars",
+      "Television"
+    ]
+  },
+  "Financials": {
+    "poly_tag": "Commodities",
+    "kalshi_category": "Financials",
+    "kalshi_tags": [
+      "WTI",
+      "Treasuries",
+      "S&P",
+      "Nasdaq"
+    ]
+  },
+  "Health": {
+    "poly_tag": "H5N1",
+    "kalshi_category": "Health",
+    "kalshi_tags": [
+      "Diseases",
+      "Vaccines",
+      "FDA Approval"
+    ]
+  },
+  "Mentions": {
+    "poly_tag": "magazine",
+    "kalshi_category": "Mentions",
+    "kalshi_tags": []
+  },
+  "Politics": {
+    "poly_tag": "u.s. supreme court",
+    "kalshi_category": "Politics",
+    "kalshi_tags": [
+      "SCOTUS & courts",
+      "Bills",
+      "Policy",
+      "Confirmations"
+    ]
+  },
+  "Science and Technology": {
+    "poly_tag": "alien",
+    "kalshi_category": "Science and Technology",
+    "kalshi_tags": [
+      "Space",
+      "AI",
+      "Papers"
+    ]
+  },
+  "Social": {
+    "poly_tag": "dating",
+    "kalshi_category": "Social",
+    "kalshi_tags": []
+  },
+  "Sports": {
+    "poly_tag": "minnesota vikings",
+    "kalshi_category": "Sports",
+    "kalshi_tags": [
+      "NFL",
+      "Football"
+    ]
+  },
+  "Transportation": {
+    "poly_tag": "international travel",
+    "kalshi_category": "Transportation",
+    "kalshi_tags": [
+      "Airlines & aviation"
+    ]
+  },
+  "World": {
+    "poly_tag": "international affairs",
+    "kalshi_category": "World",
+    "kalshi_tags": [
+      "Foreign economies"
+    ]
+  }
+}

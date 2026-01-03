@@ -5,8 +5,8 @@ from openai_matching_layer import get_matching_pairs
 
 # rate limiting constants
 KALSHI_RATE_LIMIT = 1/19
-POLY_RATE_LIMIT = 1/10 
-REQUEST_TIMEOUT = 10    
+POLY_RATE_LIMIT = 1/10
+REQUEST_TIMEOUT = 10
 
 
 class PolyExtractor:
@@ -14,10 +14,11 @@ class PolyExtractor:
         self.BASE = "https://gamma-api.polymarket.com"
         self.title_to_markets = {}
         self.session = requests.Session()
-         
+
     def get_tag_id(self, tag_name: str):
         try:
-            response = self.session.get(f"{self.BASE}/tags", timeout=REQUEST_TIMEOUT)
+            response = self.session.get(
+                f"{self.BASE}/tags", timeout=REQUEST_TIMEOUT)
             response.raise_for_status()
             all_tags = response.json()
         except requests.exceptions.RequestException as e:
@@ -27,13 +28,13 @@ class PolyExtractor:
         for tag in all_tags:
             if tag['label'].lower() == tag_name.lower():
                 return tag['id']
-        
-        print(f"[ERROR] Did not find tag: {tag_name}") 
+
+        print(f"[ERROR] Did not find tag: {tag_name}")
         return None
-    
-    def get_events(self, tag_name = None, closed = "false", limit = 1000):
-        event_params = {"limit" : limit,
-                 "closed" : closed}
+
+    def get_events(self, tag_name=None, closed="false", limit=1000):
+        event_params = {"limit": limit,
+                        "closed": closed}
         if tag_name:
             tag_id = self.get_tag_id(tag_name)
             if tag_id is None:
@@ -44,8 +45,8 @@ class PolyExtractor:
         while True:
             try:
                 response = self.session.get(
-                    f"{self.BASE}/events", 
-                    params=event_params, 
+                    f"{self.BASE}/events",
+                    params=event_params,
                     timeout=REQUEST_TIMEOUT
                 )
                 response.raise_for_status()
@@ -58,10 +59,10 @@ class PolyExtractor:
                 break
 
             all_events.extend(events)
-            
+
             if len(events) < limit:
                 break
-            
+
             event_params["offset"] = len(all_events)
             time.sleep(POLY_RATE_LIMIT)
 
@@ -71,7 +72,7 @@ class PolyExtractor:
                 self.title_to_markets[market["question"]] = market
 
         return all_events
-    
+
     def get_markets(self, events):
         return events['markets']
 
@@ -86,9 +87,9 @@ class PolyExtractor:
             for outcome, price in zip(outcomes, outcome_prices):
                 print(f"{outcome}: {price}")
 
-    #this assumes yes/no market
+    # this assumes yes/no market
     # returns yes price, no price and link to market
-    def get_market_yn_link(self,market):
+    def get_market_yn_link(self, market):
         if not market:
             return None, None, None
         outcome_prices = json.loads(market.get("outcomePrices"))
@@ -99,8 +100,6 @@ class PolyExtractor:
             return None, None, None
         link = f"https://polymarket.com/market/{slug}"
         return outcome_prices[0], outcome_prices[1], link
-        
-
 
 
 class KalshiExtractor:
@@ -113,14 +112,15 @@ class KalshiExtractor:
 
     def get_series(self, category, tag):
         if tag is not None:
-            series_params = {"limit" : 1000, "category" : category, "tags" : tag}
+            series_params = {"limit": 1000, "category": category, "tags": tag}
         else:
-            series_params = {"limit" : 1000, "category" : category}
+            series_params = {"limit": 1000, "category": category}
 
         all_series = []
         while True:
             try:
-                response = self.session.get(f"{self.BASE}/series", params=series_params, timeout=REQUEST_TIMEOUT)
+                response = self.session.get(
+                    f"{self.BASE}/series", params=series_params, timeout=REQUEST_TIMEOUT)
                 response.raise_for_status()
                 series_data = response.json()
             except requests.exceptions.RequestException as e:
@@ -144,13 +144,14 @@ class KalshiExtractor:
 
     def get_markets(self, ticker, limit=100):
         market_params = {
-            "series_ticker": ticker, 
-            "limit": limit, 
+            "series_ticker": ticker,
+            "limit": limit,
             "status": "open"
         }
 
         try:
-            response = self.session.get(f"{self.BASE}/markets", params=market_params, timeout=REQUEST_TIMEOUT)
+            response = self.session.get(
+                f"{self.BASE}/markets", params=market_params, timeout=REQUEST_TIMEOUT)
             response.raise_for_status()
             markets = response.json().get('markets', [])
         except requests.exceptions.RequestException as e:
@@ -162,7 +163,7 @@ class KalshiExtractor:
         for market in markets:
             title = f"{market['title']} {market.get('yes_sub_title', '')}"
             self.title_to_markets[title.strip()] = market
-        
+
         return markets
 
     def print_market(self, market):
@@ -172,12 +173,13 @@ class KalshiExtractor:
         print(f"yes ask: {market['yes_ask']}")
         print(f"no ask: {market['no_ask']}")
 
-    def get_series_ticker_for_event(self, event_ticker): 
+    def get_series_ticker_for_event(self, event_ticker):
         if event_ticker in self.event_to_series:
             return self.event_to_series[event_ticker]
 
         try:
-            response = self.session.get(f"{self.BASE}/events/{event_ticker}", timeout=REQUEST_TIMEOUT)
+            response = self.session.get(
+                f"{self.BASE}/events/{event_ticker}", timeout=REQUEST_TIMEOUT)
             response.raise_for_status()
             series_ticker = response.json()["event"]["series_ticker"]
         except requests.exceptions.RequestException as e:
@@ -189,12 +191,12 @@ class KalshiExtractor:
 
         time.sleep(KALSHI_RATE_LIMIT)
         self.event_to_series[event_ticker] = series_ticker
-        return series_ticker   
+        return series_ticker
 
     def get_market_yn_link(self, market):
         if not market:
             return None, None, None
-        
+
         event_ticker = market.get('event_ticker')
         if not event_ticker:
             return None, None, None
@@ -203,10 +205,10 @@ class KalshiExtractor:
             return None, None, None
 
         link = f"https://kalshi.com/markets/{series_ticker.lower()}"
-        
+
         yes_ask = market.get('yes_ask')
         no_ask = market.get('no_ask')
-        
+
         if yes_ask is None or no_ask is None:
             return None, None, None
 
@@ -223,10 +225,11 @@ class ArbitragePair:
         self.poly_title = p_title
         self.poly_yes_price = float(p_yes_price)
         self.poly_no_price = float(p_no_price)
-        self.poly_link = p_link 
- 
-        self.arbitrage = "none" #none for no, pk for yes poly and no kalshi, kp for yes kalshi no poly, both for both
-        self.edge = 0.0 
+        self.poly_link = p_link
+
+        # none for no, pk for yes poly and no kalshi, kp for yes kalshi no poly, both for both
+        self.arbitrage = "none"
+        self.edge = 0.0
         self.check_arb()
 
     def check_arb(self):
@@ -246,15 +249,15 @@ class ArbitragePair:
         elif kalshi_yes_poly_no < 1:
             self.arbitrage = "kp"
             self.edge = 1 - kalshi_yes_poly_no
-        
+
         return self.arbitrage
-    
+
     def print(self):
         if self.arbitrage == "none":
             return
-    
-        print("=" * 80) 
-        
+
+        print("=" * 80)
+
         print("\nKALSHI")
         print(f"  Title: {self.kalshi_title}")
         print(f"  YES:   {self.kalshi_yes_price:.4f}")
@@ -283,62 +286,65 @@ def write_to_file(filepath, data):
 
 if __name__ == "__main__":
     poly_extractor = PolyExtractor()
-    kalshi_extractor = KalshiExtractor()    
+    kalshi_extractor = KalshiExtractor()
 
     bitcoin_events = poly_extractor.get_events("Trump")
     bitcoin_series = []
-    bitcoin_series.extend(kalshi_extractor.get_series(category="Politics", tag="Trump Agenda"))
-    bitcoin_series.extend(kalshi_extractor.get_series(category="Politics", tag="Trump Policies"))
+    bitcoin_series.extend(kalshi_extractor.get_series(
+        category="Politics", tag="Trump Agenda"))
+    bitcoin_series.extend(kalshi_extractor.get_series(
+        category="Politics", tag="Trump Policies"))
 
-    #get list of all markets under all series/events related to category specified
-    bitcoin_poly_markets = []         
-    bitcoin_kalshi_markets = []         
+    # get list of all markets under all series/events related to category specified
+    bitcoin_poly_markets = []
+    bitcoin_kalshi_markets = []
 
     for event in bitcoin_events:
         markets = poly_extractor.get_markets(event)
         for market in markets:
             bitcoin_poly_markets.append(market['question'])
 
-
-
     for series in bitcoin_series:
         markets = kalshi_extractor.get_markets(series['ticker'])
         for market in markets:
-            bitcoin_kalshi_markets.append(f"{market['title']} {market['yes_sub_title']}")
+            bitcoin_kalshi_markets.append(
+                f"{market['title']} {market['yes_sub_title']}")
 
     print(f"len of poly markets {len(bitcoin_poly_markets)}")
     print(f"len of kalshi markets {len(bitcoin_kalshi_markets)}")
 
-    matching_pairs = get_matching_pairs(poly_titles_in = bitcoin_poly_markets,kalshi_titles_in = bitcoin_kalshi_markets)
+    matching_pairs = get_matching_pairs(
+        poly_titles_in=bitcoin_poly_markets, kalshi_titles_in=bitcoin_kalshi_markets)
     #
     # with open("arb_pairs.json", "r") as f:
     #     matching_pairs = json.load(f)
     #
-    pair_list = [] 
-    #print matching arb pairs
+    pair_list = []
+    # print matching arb pairs
     for matching_pair in matching_pairs:
         poly_title = matching_pair['poly_title']
         poly_market = poly_extractor.title_to_markets.get(poly_title, {})
         kalshi_title = matching_pair['kalshi_title']
         kalshi_market = kalshi_extractor.title_to_markets.get(kalshi_title, {})
 
-
         p_yes, p_no, p_link = poly_extractor.get_market_yn_link(poly_market)
-        k_yes, k_no, k_link = kalshi_extractor.get_market_yn_link(kalshi_market)
-        
-        if None in (kalshi_title, k_yes, k_no, k_link, poly_title, p_yes, p_no, p_link):    
-            continue
-        pair_list.append(ArbitragePair(kalshi_title, k_yes, k_no, k_link, poly_title, p_yes, p_no, p_link))
+        k_yes, k_no, k_link = kalshi_extractor.get_market_yn_link(
+            kalshi_market)
 
-        #poly_extractor.print_market(poly_market)
-        #print("\n")
-        #kalshi_extractor.print_market(kalshi_market)
-        #print("\n"*3)
-    
-    arbitrage_pair_list = [pair for pair in pair_list if pair.arbitrage != "none"]
+        if None in (kalshi_title, k_yes, k_no, k_link, poly_title, p_yes, p_no, p_link):
+            continue
+        pair_list.append(ArbitragePair(kalshi_title, k_yes,
+                         k_no, k_link, poly_title, p_yes, p_no, p_link))
+
+        # poly_extractor.print_market(poly_market)
+        # print("\n")
+        # kalshi_extractor.print_market(kalshi_market)
+        # print("\n"*3)
+
+    arbitrage_pair_list = [
+        pair for pair in pair_list if pair.arbitrage != "none"]
 
     arbitrage_pair_list.sort(key=lambda x: x.edge)
     print('Arb Pairs:')
     for arb_pair in arbitrage_pair_list:
         arb_pair.print()
-        
