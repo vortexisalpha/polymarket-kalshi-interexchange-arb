@@ -163,6 +163,13 @@ class Formatter:
         poly_market_ttm = {}
 
         exchange = "poly"
+
+        def _to_number(val):
+            try:
+                return float(val)
+            except Exception:
+                return None
+
         for market in poly_ttm.values():
             title = market['question']
             category = market.get('category', '')
@@ -174,30 +181,37 @@ class Formatter:
             slug = market['slug']
             link = f"https://polymarket.com/market/{slug}"
 
+            strike_lb = None
+            strike_ub = None
+
             group_item_title = market.get('groupItemTitle', '')
             if len(group_item_title) > 0:
                 group_item_title = group_item_title.replace(
                     ",", "").replace("$", "")
                 if group_item_title[0] == '<':
-                    strike_ub = int(group_item_title[1:])
+                    strike_ub = _to_number(group_item_title[1:])
                     strike_lb = None
 
                 elif group_item_title[0] == '>':
                     strike_ub = None
-                    strike_lb = int(group_item_title[1:])
+                    strike_lb = _to_number(group_item_title[1:])
 
                 elif '-' in group_item_title and group_item_title[0].isdigit():
                     prices = group_item_title.split('-')
-                    strike_lb = int(prices[0])
-                    strike_ub = int(prices[1])
-
-                elif group_item_title.isdigit():
-                    strike_ub = int(group_item_title)
-                    strike_lb = None
+                    strike_lb = _to_number(prices[0])
+                    strike_ub = _to_number(prices[1])
 
                 else:
-                    strike_ub, strike_lb = self.bounds_from_title(
-                        title)
+                    direct = _to_number(group_item_title)
+                    if direct is not None:
+                        strike_ub = direct
+                        strike_lb = None
+                    else:
+                        strike_ub, strike_lb = self.bounds_from_title(
+                            title)
+
+                if strike_lb is None and strike_ub is None:
+                    strike_ub, strike_lb = self.bounds_from_title(title)
             else:
                 strike_ub, strike_lb = self.bounds_from_title(title)
 

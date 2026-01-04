@@ -1,10 +1,17 @@
 import requests
 import time
 import json
+import random
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # rate limiting constants
-KALSHI_RATE_LIMIT = 1/19
-POLY_RATE_LIMIT = 1/10
+# Kalshi has strict rate limits; use conservative defaults and backoff.
+KALSHI_RATE_LIMIT = 0.5  # base delay between successful requests (lowered for speed)
+KALSHI_MAX_RETRIES = 5
+KALSHI_BACKOFF_BASE = 0.8
+KALSHI_BACKOFF_FACTOR = 1.8
+
+POLY_RATE_LIMIT = 0.05  # Polymarket is more lenient
 REQUEST_TIMEOUT = 10
 
 
@@ -13,22 +20,34 @@ class PolyExtractor:
         self.BASE = "https://gamma-api.polymarket.com"
         self.title_to_markets = {}
         self.session = requests.Session()
+        self._tag_cache = {}
+        self._all_tags = None
 
-    def get_tag_id(self, tag_name: str):
+    def _fetch_all_tags(self):
+        if self._all_tags is not None:
+            return self._all_tags
         try:
             response = self.session.get(
                 f"{self.BASE}/tags", timeout=REQUEST_TIMEOUT)
             response.raise_for_status()
-            all_tags = response.json()
+            self._all_tags = response.json()
         except requests.exceptions.RequestException as e:
             print(f"[ERROR] Failed to fetch tags: {e}")
-            return None
+            self._all_tags = []
+        return self._all_tags
 
+    def get_tag_id(self, tag_name: str):
+        if tag_name in self._tag_cache:
+            return self._tag_cache[tag_name]
+
+        all_tags = self._fetch_all_tags()
         for tag in all_tags:
             if tag['label'].lower() == tag_name.lower():
+                self._tag_cache[tag_name] = tag['id']
                 return tag['id']
 
         print(f"[ERROR] Did not find tag: {tag_name}")
+        self._tag_cache[tag_name] = None
         return None
 
     def get_events(self, tag_name=None, closed="false", limit=1000):
@@ -108,6 +127,72 @@ class KalshiExtractor:
         self.title_to_markets = {}
         self.event_to_series = {}
         self.session = requests.Session()
+        self.series_to_markets = {}
+        self._last_request_ts = 0.0
+        self._category_markets_cache = {}
+        self._seen_market_tickers = set()
+
+    def _compute_backoff_delay(self, attempt: int, retry_after_header=None):
+        """
+        attempt is zero-based; retry_after_header (str) may come from Kalshi.
+        """
+        if retry_after_header:
+            try:
+                retry_after = float(retry_after_header)
+                return max(retry_after, KALSHI_RATE_LIMIT)
+            except ValueError:
+                pass
+        return max(KALSHI_BACKOFF_BASE * (KALSHI_BACKOFF_FACTOR ** attempt), KALSHI_RATE_LIMIT)
+
+    def _get_with_backoff(self, url, params=None):
+        """
+        Centralized GET with retry/backoff to handle Kalshi 429s gracefully.
+        """
+        for attempt in range(KALSHI_MAX_RETRIES + 1):
+            # enforce a minimum spacing between calls to avoid burst 429s
+            now = time.time()
+            wait = self._last_request_ts + KALSHI_RATE_LIMIT - now
+            if wait > 0:
+                time.sleep(wait)
+            try:
+                response = self.session.get(
+                    url, params=params, timeout=REQUEST_TIMEOUT)
+                self._last_request_ts = time.time()
+            except requests.exceptions.RequestException as e:
+                self._last_request_ts = time.time()
+                if attempt >= KALSHI_MAX_RETRIES:
+                    print(f"[ERROR] Kalshi request failed after retries for {url}: {e}")
+                    return None
+                sleep_for = self._compute_backoff_delay(attempt)
+                print(f"[WARN] Kalshi request error. Retrying in {sleep_for:.2f}s... ({attempt+1}/{KALSHI_MAX_RETRIES})")
+                time.sleep(sleep_for)
+                continue
+
+            if response.status_code == 429:
+                self._last_request_ts = time.time()
+                if attempt >= KALSHI_MAX_RETRIES:
+                    print(f"[ERROR] Kalshi rate limit reached repeatedly for {url}")
+                    return None
+                sleep_for = self._compute_backoff_delay(
+                    attempt, response.headers.get("Retry-After"))
+                sleep_for += random.uniform(0, 0.3)
+                print(f"[WARN] Kalshi rate limited (429) on {url}. Sleeping {sleep_for:.2f}s before retry {attempt+1}.")
+                time.sleep(sleep_for)
+                continue
+
+            try:
+                response.raise_for_status()
+                return response
+            except requests.exceptions.RequestException as e:
+                self._last_request_ts = time.time()
+                if attempt >= KALSHI_MAX_RETRIES:
+                    print(f"[ERROR] Kalshi request failed after retries for {url}: {e}")
+                    return None
+                sleep_for = self._compute_backoff_delay(attempt)
+                print(f"[WARN] Kalshi request HTTP error. Retrying in {sleep_for:.2f}s... ({attempt+1}/{KALSHI_MAX_RETRIES})")
+                time.sleep(sleep_for)
+
+        return None
 
     def get_series(self, category, tag):
         if tag is not None:
@@ -117,14 +202,12 @@ class KalshiExtractor:
 
         all_series = []
         while True:
-            try:
-                response = self.session.get(
-                    f"{self.BASE}/series", params=series_params, timeout=REQUEST_TIMEOUT)
-                response.raise_for_status()
-                series_data = response.json()
-            except requests.exceptions.RequestException as e:
-                print(f"[ERROR] Failed to fetch series: {e}")
+            response = self._get_with_backoff(
+                f"{self.BASE}/series", params=series_params)
+            if response is None:
+                print(f"[ERROR] Failed to fetch series after retries for params {series_params}")
                 break
+            series_data = response.json()
 
             series = series_data.get("series", [])
             all_series.extend(series)
@@ -141,29 +224,81 @@ class KalshiExtractor:
 
         return all_series
 
-    def get_markets(self, ticker, limit=100):
+    def get_all_markets_for_category(self, category, limit=200):
+        """Fetch ALL open markets for a category in one paginated call (much faster)."""
+        if category in self._category_markets_cache:
+            return self._category_markets_cache[category]
+
+        market_params = {
+            "limit": limit,
+            "status": "open"
+        }
+
+        all_markets = []
+        print(f"[INFO] Fetching all Kalshi markets (open, paginated)...")
+        while True:
+            response = self._get_with_backoff(
+                f"{self.BASE}/markets", params=market_params)
+            if response is None:
+                print(f"[ERROR] Failed to fetch all markets after retries")
+                break
+            data = response.json()
+            page_markets = data.get('markets', [])
+            all_markets.extend(page_markets)
+            print(f"[INFO] Kalshi markets fetched so far: {len(all_markets)}")
+
+            cursor = data.get("cursor")
+            if not cursor:
+                break
+            market_params["cursor"] = cursor
+
+        # Deduplicate and update caches
+        unique_markets = []
+        for market in all_markets:
+            ticker = market.get('ticker', '')
+            if ticker not in self._seen_market_tickers:
+                self._seen_market_tickers.add(ticker)
+                unique_markets.append(market)
+                title = f"{market['title']} {market.get('yes_sub_title', '')}"
+                self.title_to_markets[title.strip()] = market
+
+        self._category_markets_cache[category] = unique_markets
+        print(f"[INFO] Total unique Kalshi markets: {len(unique_markets)}")
+        return unique_markets
+
+    def get_markets(self, ticker, limit=100, force_refresh=False):
         market_params = {
             "series_ticker": ticker,
             "limit": limit,
             "status": "open"
         }
 
-        try:
-            response = self.session.get(
-                f"{self.BASE}/markets", params=market_params, timeout=REQUEST_TIMEOUT)
-            response.raise_for_status()
-            markets = response.json().get('markets', [])
-        except requests.exceptions.RequestException as e:
-            print(f"[ERROR] Failed to fetch markets for {ticker}: {e}")
-            return []
+        if not force_refresh and ticker in self.series_to_markets:
+            return self.series_to_markets[ticker]
 
-        time.sleep(KALSHI_RATE_LIMIT)
+        all_markets = []
+        while True:
+            response = self._get_with_backoff(
+                f"{self.BASE}/markets", params=market_params)
+            if response is None:
+                print(f"[ERROR] Failed to fetch markets for {ticker} after retries")
+                break
+            data = response.json()
+            page_markets = data.get('markets', [])
+            all_markets.extend(page_markets)
 
-        for market in markets:
+            cursor = data.get("cursor")
+            if not cursor:
+                break
+            market_params["cursor"] = cursor
+            time.sleep(KALSHI_RATE_LIMIT)
+
+        for market in all_markets:
             title = f"{market['title']} {market.get('yes_sub_title', '')}"
             self.title_to_markets[title.strip()] = market
+        self.series_to_markets[ticker] = all_markets
 
-        return markets
+        return all_markets
 
     def print_market(self, market):
         if not market:
@@ -176,14 +311,13 @@ class KalshiExtractor:
         if event_ticker in self.event_to_series:
             return self.event_to_series[event_ticker]
 
-        try:
-            response = self.session.get(
-                f"{self.BASE}/events/{event_ticker}", timeout=REQUEST_TIMEOUT)
-            response.raise_for_status()
-            series_ticker = response.json()["event"]["series_ticker"]
-        except requests.exceptions.RequestException as e:
-            print(f"[ERROR] Failed to fetch event {event_ticker}: {e}")
+        response = self._get_with_backoff(
+            f"{self.BASE}/events/{event_ticker}")
+        if response is None:
+            print(f"[ERROR] Failed to fetch event {event_ticker} after retries")
             return None
+        try:
+            series_ticker = response.json()["event"]["series_ticker"]
         except KeyError:
             print(f"[ERROR] Event {event_ticker} has no series_ticker")
             return None
